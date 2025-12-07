@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call of Duty - Operator Profile Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(20,20,20,0.95) 100%),
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0,255,65,0.5);
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #333;
+            z-index: 0;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 2px;
+            background: #00ff41;
+            transition: width 0.3s ease;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0,255,65,0.8);
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #00ff41;
+            border-color: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0,255,65,0.6);
+        }
+
+        .step.completed {
+            background: #00ff41;
+            border-color: #00ff41;
+            color: #000;
+        }
+
+        .card {
+            background: rgba(26,26,26,0.9);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0,255,65,0.3);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option, .checkbox-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .radio-option input, .checkbox-option input {
+            display: none;
+        }
+
+        .radio-option label, .checkbox-option label {
+            display: block;
+            padding: 15px;
+            background: #0f0f0f;
+            border: 2px solid #333;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option input:checked + label, .checkbox-option input:checked + label {
+            border-color: #00ff41;
+            background: rgba(0,255,65,0.1);
+            color: #00ff41;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            background: #00ff41;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #00cc33;
+            box-shadow: 0 0 20px rgba(0,255,65,0.5);
+            transform: translateY(-2px);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 2px solid #333;
+            color: #fff;
+        }
+
+        button.secondary:hover {
+            border-color: #00ff41;
+            color: #00ff41;
+            box-shadow: none;
+        }
+
+        .completion {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .completion-icon {
+            font-size: 80px;
+            color: #00ff41;
+            margin-bottom: 20px;
+        }
+
+        .completion h2 {
+            margin-bottom: 20px;
+        }
+
+        .completion p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<Body>
+      <div class="background"></div>
+    
+    <div class="container">
+        <div class="logo">
+            <h1>CALL OF DUTY</h1>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">3</div>
+            <div class="step" id="step4">4</div>
+            <div class="step" id="step5">5</div>
+            <div class="step" id="step6">6</div>
+            <div class="step" id="step7">7</div>
+            <div class="step" id="step8">8</div>
+            <div class="step" id="step9">9</div>
+            <div class="step" id="step10">10</div>
+        </div>
+
+        <div class="card">
+            <!-- Page 1: Welcome -->
+            <div class="page active" id="page1">
+                <h2>Welcome Operator</h2>
+                <p class="subtitle">Let's customize your combat experience</p>
+                
+                <div class="form-group">
+                    <label>Operator Callsign</label>
+                    <input type="text" placeholder="Enter your preferred callsign">
+                </div>
+                
+                <div class="form-group">
+                    <label>Region</label>
+                    <select>
+                        <option>Select your region</option>
+                        <option>North America</option>
+                        <option>Europe</option>
+                        <option>Asia</option>
+                        <option>South America</option>
+                        <option>Oceania</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 2: Platform Selection -->
+            <div class="page" id="page2">
+                <h2>Platform</h2>
+                <p class="subtitle">Choose your primary gaming platform</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="platform" id="pc" checked>
+                            <label for="pc">PC</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="platform" id="ps5">
+                            <label for="ps5">PlayStation 5</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="platform" id="xbox">
+                            <label for="xbox">Xbox Series X/S</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 3: Game Preferences -->
+            <div class="page" id="page3">
+                <h2>Game Mode</h2>
+                <p class="subtitle">Select your preferred game modes</p>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="multiplayer" checked>
+                            <label for="multiplayer">Multiplayer</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="warzone">
+                            <label for="warzone">Warzone</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="campaign">
+                            <label for="campaign">Campaign</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="zombies">
+                            <label for="zombies">Zombies</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 4: Skill Level -->
+            <div class="page" id="page4">
+                <h2>Experience</h2>
+                <p class="subtitle">Rate your combat experience</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="skill" id="beginner" checked>
+                            <label for="beginner">Recruit</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="skill" id="intermediate">
+                            <label for="intermediate">Veteran</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="skill" id="expert">
+                            <label for="expert">Elite</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 5: Playstyle -->
+            <div class="page" id="page5">
+                <h2>Playstyle</h2>
+                <p class="subtitle">How do you approach combat?</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="playstyle" id="aggressive" checked>
+                            <label for="aggressive">Aggressive</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="playstyle" id="tactical">
+                            <label for="tactical">Tactical</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="playstyle" id="support">
+                            <label for="support">Support</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 6: Weapon Class -->
+            <div class="page" id="page6">
+                <h2>Weapon Class</h2>
+                <p class="subtitle">Choose your primary weapon type</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="weapon" id="ar" checked>
+                            <label for="ar">Assault Rifle</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="weapon" id="smg">
+                            <label for="smg">SMG</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="weapon" id="sniper">
+                            <label for="sniper">Sniper</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="weapon" id="lmg">
+                            <label for="lmg">LMG</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 7: Communication -->
+            <div class="page" id="page7">
+                <h2>Communication</h2>
+                <p class="subtitle">Voice chat preferences</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="voice" id="voiceAlways" checked>
+                            <label for="voiceAlways">Always On</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="voice" id="voiceTeam">
+                            <label for="voiceTeam">Team Only</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="voice" id="voiceOff">
+                            <label for="voiceOff">Disabled</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 8: Graphics Settings -->
+            <div class="page" id="page8">
+                <h2>Performance</h2>
+                <p class="subtitle">Optimize your visual experience</p>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="graphics" id="quality" checked>
+                            <label for="quality">Quality</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="graphics" id="balanced">
+                            <label for="balanced">Balanced</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="graphics" id="performance">
+                            <label for="performance">Performance</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 9: Notifications -->
+            <div class="page" id="page9">
+                <h2>Updates</h2>
+                <p class="subtitle">Stay informed about events and missions</p>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="gameUpdates" checked>
+                            <label for="gameUpdates">Game Updates</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="events" checked>
+                            <label for="events">Events</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="news">
+                            <label for="news">News</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="prevPage()">Back</button>
+                    <button onclick="nextPage()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Page 10: Completion -->
+            <div class="page" id="page10">
+                <div class="completion">
+                    <div class="completion-icon">✓</div>
+                    <h2>Profile Complete</h2>
+                    <p class="subtitle">Your operator profile is ready</p>
+                    <p>You're all set. Time to deploy into the battlefield.</p>
+                    <div class="button-group">
+                        <button onclick="goToCOD()">Launch Call of Duty</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 10;
+
+        function updateProgress() {
+            // Update progress bar
+            const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Update step indicators
+            for (let i = 1; i <= totalPages; i++) {
+                const step = document.getElementById('step' + i);
+                if (i < currentPage) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (i === currentPage) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                document.getElementById('page' + currentPage).classList.remove('active');
+                currentPage++;
+                document.getElementById('page' + currentPage).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                document.getElementById('page' + currentPage).classList.remove('active');
+                currentPage--;
+                document.getElementById('page' + currentPage).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function goToCOD() {
+            window.location.href = 'https://www.callofduty.com';
+        }
+
+        // Initialize progress
+        updateProgress();
+    </script>
+</body>
+</html>
